@@ -6,7 +6,7 @@ class LiFo{
 
 	protected:
 
-		int* aData;
+		float* aData;
 		int aMax;
 		int aCurr;
 
@@ -20,7 +20,7 @@ class LiFo{
 
 			if(aMax > 0){
 
-				aData = new int[aMax];
+				aData = new float[aMax];
 			}
 		}// Constructor
 
@@ -34,7 +34,7 @@ class LiFo{
 			cout << "Bye" << endl;
 		}// Destructor
 
-		void push(int pVal){
+		void push(float pVal){
 
 			if(aData){
 
@@ -45,9 +45,9 @@ class LiFo{
 			}	
 		}// push
 
-		int pop(){
+		float pop(){
 
-			int lVal = 0;
+			float lVal = 0;
 
 			if(aData){
 
@@ -90,11 +90,11 @@ int main(){
 	LiFo lPila = LiFo(3);
 
 	lPila.descr();
-	lPila.push(-2);
+	lPila.push(-2.5);
 	lPila.descr();
-	lPila.push(20);
+	lPila.push(20.5);
 	lPila.descr();
-	lPila.push(10);
+	lPila.push(10.5);
 	lPila.descr();
 	lPila.push(10);
 	lPila.descr();
