@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#define M_PI 3.14159
 
 using namespace std;
 

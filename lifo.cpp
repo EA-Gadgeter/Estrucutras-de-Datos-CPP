@@ -103,7 +103,7 @@ class LiFo{
 				cout << aData[i] << "|";
 			}
 
-			cout << endl;
+			cout << endl;git
 		}
 
 		T get(int indice){
@@ -181,7 +181,6 @@ class LiFo{
 				}
 			}
 
-
 		}//resize
 
 };
@@ -199,7 +198,7 @@ int main(){
 	lPila.descr();
 	lPila.push(10);
 	lPila.descr();
-
+	
 	cout << "-----" << endl;
 
 	cout << lPila.get(1) << endl;
@@ -219,6 +218,6 @@ int main(){
 		lPila.descr();
 	}
 	
-	
+	// 
 	return 0;
 }
