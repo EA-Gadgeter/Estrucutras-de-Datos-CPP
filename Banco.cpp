@@ -205,7 +205,7 @@ int fnRnd(int pMin, int pMax){
 
 #define K_MAX_CAJAS 3
 #define K_MAX_PERSONAS 100
-#define K_MAX_FILA 5
+#define K_MAX_FILA 10
 
 int main(){
 
@@ -219,6 +219,7 @@ int main(){
     int lRebotes = 0;
     int lTermino = 0;
     bool lFin = false;
+    int lVolado = 0;
 
     for (int i = 0; i < K_MAX_CAJAS; i++){
 
@@ -232,23 +233,49 @@ int main(){
         if(lNumPers < lMaxPers){
 
             lNumPers++;
-            lNOpers = fnRnd(1, 5);
+            
+            // Para probar que la fila especial funciona
+            // Forzamos para que haya un 50% de probabilidad de salga un 1
+            lNOpers = fnRnd(1, 10); //Tiramos un "dado" de 10 caras
+            if(lNOpers % 2 == 0){ // Si sale un par, la operacion va de 2 a 5
+
+                lNOpers = fnRnd(2, 5);
+            }
+            else lNOpers = 1; // Si es impar, lo cual tiene un 50% de probabilidad, la operacion es 1
 
             if(lNOpers == 1){
+                
+                if(lFiFoOne.isFull()){
 
-                if(!lFiFoOne.isFull()){
+                    if(lFiFo.isFull()){
+
+                        lRebotes++;
+                    }
+                    else{
+
+                        lVolado = fnRnd(1, 2);
+                        if(lVolado == 1){
+
+                            lFiFo.push(lNOpers);
+                        }
+                        else lRebotes++;
+
+                    }
+                }
+                else{
 
                     lFiFoOne.push(lNOpers);
-
-                } else lRebotes++;
+                }
             }
             else{
+
                 if(!lFiFo.isFull()){
 
                     lFiFo.push(lNOpers);
                 }
                 else lRebotes++;
             }
+            
 
         }
 
