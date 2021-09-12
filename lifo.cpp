@@ -11,6 +11,7 @@ class LiFo{
 		int aMax;
 		int aStep;
 		int aCurr;
+		int aContPrimos = 0;
 
 	public:
 		
@@ -46,8 +47,6 @@ class LiFo{
 
 				delete aData;
 			}
-
-			cout << "Bye" << endl;
 		}// Destructor
 
 		void push(T pVal){
@@ -57,6 +56,17 @@ class LiFo{
 				if(!isFull()){
 
 					aData[aCurr++] = pVal;
+					bool esPrimo = true;
+
+					if(pVal!=1 && pVal!=0 && pVal!=4){
+
+						for(int i=2; i < pVal/2; i++){
+
+							if(pVal % i == 0) esPrimo = false;
+						}
+
+						if(esPrimo) aContPrimos++;
+					}
 				}
 				else {
 
@@ -103,7 +113,7 @@ class LiFo{
 				cout << aData[i] << "|";
 			}
 
-			cout << endl;git
+			cout << endl;
 		}
 
 		T get(int indice){
@@ -155,6 +165,10 @@ class LiFo{
 			return indice;
 		}// busca la primera ocurrencia de un valor dado, regresa el indice
 
+		int cantidadPrimos(){
+			return aContPrimos;
+		}
+
 	private:
 		
 		void resize(){
@@ -187,37 +201,16 @@ class LiFo{
 
 int main(){
 
-	LiFo<float> lPila = LiFo<float>(3, 1);
+	LiFo<int> lPila = LiFo<int>(5, 1);
 
-	lPila.descr();
-	lPila.push(-2.5);
-	lPila.descr();
-	lPila.push(20.5);
-	lPila.descr();
-	lPila.push(10.5);
-	lPila.descr();
-	lPila.push(10);
-	lPila.descr();
+	lPila.push(1);
+	lPila.push(2);
+	lPila.push(3);
+	lPila.push(4);
+	lPila.push(97);
+
+	cout << lPila.cantidadPrimos();
 	
-	cout << "-----" << endl;
-
-	cout << lPila.get(1) << endl;
-	cout << lPila.get(-1) << endl;
-	cout << lPila[2] << endl;
-	int lIndx = lPila.search(10);
-	if(lIndx != -1){
-
-		cout << lIndx << ", " << lPila[lIndx] << endl;
-	}
-
-	cout << "-----" << endl;
 	
-	for(int i=0; i < 4;i++){
-
-		cout << lPila.pop() << endl;
-		lPila.descr();
-	}
-	
-	// 
 	return 0;
 }
