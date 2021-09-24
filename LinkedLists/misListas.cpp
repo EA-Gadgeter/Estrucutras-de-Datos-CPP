@@ -8,16 +8,9 @@ int main(){
 
     Lista lLst = Lista();
 
-    lLst.insert("Moscu");
+    lLst.insertLeft("Moscu");
+    lLst.insertLeft("Rusia");
+    lLst.insertLeft("Tlacotepec");
     lLst.show();
-    lLst.insert("Cd.Mex"); lLst.show();
-    lLst.insert("Cairo"); lLst.show();
-    lLst.clear();
-    lLst.show();
-    lLst.insert("Moscu");
-    lLst.show();
-    lLst.insert("Cd.Mex"); lLst.show();
-    lLst.insert("Cairo"); lLst.show();
-    lLst.del("Moscu");
-    lLst.show();
+    
 }

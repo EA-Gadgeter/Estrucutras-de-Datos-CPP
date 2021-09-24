@@ -70,6 +70,15 @@ class Lista{
             }
         }
 
+        void insertLeft(string pVal){
+            
+            PNODE lTemp = getNew(pVal);
+
+            lTemp->sNext = aHead;
+            aHead = lTemp;
+            
+        }
+
         void del(string pVal){
 
             PNODE lF = search(pVal);
