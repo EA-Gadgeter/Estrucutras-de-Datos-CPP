@@ -10,7 +10,9 @@ int main(){
 
     lLst.insertLeft("Moscu");
     lLst.insertLeft("Rusia");
-    lLst.insertLeft("Tlacotepec");
+    lLst.insert("Tlacotepec");
+    lLst.show();
+    lLst.del("Moscu");
     lLst.show();
     
 }

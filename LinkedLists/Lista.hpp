@@ -74,9 +74,16 @@ class Lista{
             
             PNODE lTemp = getNew(pVal);
 
-            lTemp->sNext = aHead;
-            aHead = lTemp;
+            if(aTail == NULL){
             
+                aHead = lTemp;
+                aTail = lTemp;
+            }
+            else{
+
+                lTemp->sNext = aHead;
+                aHead = lTemp;
+            }
         }
 
         void del(string pVal){
@@ -99,11 +106,12 @@ class Lista{
                         delete lS;
                     }
                 }
-            }else{
+            }
+            else{
 
                 if(aHead){
 
-                    if(aHead->sVal == pVal){
+                    if(aHead->sVal == pVal){ //Verificar
 
                         lS = aHead->sNext;
 
@@ -111,7 +119,7 @@ class Lista{
                             aTail = NULL;
                         }
                         delete aHead;
-                        aHead = NULL;
+                        aHead = lS;
                     }
                 }
             }
