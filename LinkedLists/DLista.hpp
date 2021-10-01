@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -12,17 +14,20 @@ class DNODE{
         string sVal;
         PDNODE sNext;
         PDNODE sPrev;
+        int sFrec; // Frecuencia de un nodo en caso de repetidos
 };
 
 class DLista{
 
     PDNODE aHead;
     PDNODE aTail;
+    bool aChkFrec; // Booleano que permite dublicado en la lista, o contar la frecuencia
 
     public:
-        DLista(){
+        DLista(bool pChkFrec = false){ 
             aHead = NULL;// La DLista acaba de nacer, por lo que no apunta a ningun lado
-            aTail = NULL;
+            aTail = NULL; // Lo mismo que arriba
+            aChkFrec = pChkFrec;
         }
 
         ~DLista(){
@@ -47,7 +52,7 @@ class DLista{
 
             cout << "-> ";
             while(lTemp){
-                cout << lTemp->sVal << " -> ";
+                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "") << " ->";
                 lTemp = lTemp->sNext;
             }
             cout << " -> =" << endl; 
@@ -59,7 +64,7 @@ class DLista{
 
             cout << "-> ";
             while(lTemp){
-                cout << lTemp->sVal << " -> ";
+                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "") << " ->";
                 lTemp = lTemp->sPrev;
             }
             cout << " -> =" << endl;
@@ -70,16 +75,36 @@ class DLista{
 
             PDNODE lTemp = getNew(pVal);
 
-            if(aHead == NULL){
+            if(aHead == NULL){ // Por si la lista esta vacia
                 
                 aHead = lTemp;
                 aTail = lTemp;
             }
             else{
+                if(aChkFrec){ // A lor largo del programa es una validación, que activa
+                            // la frecuencia de los valores de la lista
+                    PDNODE lN = search(pVal);
 
-                aTail->sNext = lTemp;
-                lTemp->sPrev = aTail;
-                aTail = lTemp;
+                    if(lN){
+                        
+                        if(lN->sVal == pVal){
+                            lN->sFrec++;
+                        }
+                    }
+                    else{
+
+                        aTail->sNext = lTemp;
+                        lTemp->sPrev = aTail;
+                        aTail = lTemp;
+                    }
+
+                }
+                else{
+
+                    aTail->sNext = lTemp;
+                    lTemp->sPrev = aTail;
+                    aTail = lTemp;
+                }
             }
         }
 
@@ -87,66 +112,205 @@ class DLista{
             
             PDNODE lTemp = getNew(pVal);
 
-            if(aTail == NULL){
+            if(aTail == NULL){ // Por si la lista esta vacia
             
                 aHead = lTemp;
                 aTail = lTemp;
             }
             else{
 
-                aHead->sPrev = lTemp;
-                lTemp->sNext = aHead;
-                aHead = lTemp;
+                if(aChkFrec){
+
+                    PDNODE lN = search(pVal);
+
+                    if(lN){
+                        
+                        if(lN->sVal == pVal){
+                            lN->sFrec++;
+                        }
+                    }
+                    else{
+
+                        aHead->sPrev = lTemp;
+                        lTemp->sNext = aHead;
+                        aHead = lTemp;
+                    }
+
+                }
+                else{
+
+                    aHead->sPrev = lTemp;
+                    lTemp->sNext = aHead;
+                    aHead = lTemp;
+                }
             }
         }
 
-        void del(string pVal){
+        void insert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
+
+            if(aHead == NULL){ // if si la lista esta vacia
+            
+                aHead = getNew(pVal);
+                aTail = aHead; 
+            }
+            else{
+
+                PDNODE lN = find(pVal); // Buscamos donde debería ir el valor
+
+                if(lN == NULL){
+
+                    insertLeft(pVal);
+                }
+                else{
+
+                    if((lN == aTail) && (pVal > aTail->sVal)){
+
+                        insertRight(pVal);
+                    }
+                    else{
+
+                        PDNODE lF = lN->sPrev;
+
+                        if((aChkFrec) && ((lF->sVal == pVal) || (lN->sVal == pVal))){ // Verificamos si hay repetecion de valores
+
+                            if(lF->sVal == pVal)
+                                lF->sFrec++;
+                            else
+                                lN->sFrec++;
+
+                            
+                        }
+                        else{
+                            PDNODE lTemp = getNew(pVal);
+
+                            // Entre father y lN va el temp
+                            lF->sNext = lTemp;
+                            lTemp->sNext = lN;
+                            lN->sPrev = lTemp;
+                            lTemp->sPrev = lF;
+                        }
+
+                        
+                    }
+                }
+            }
+        }
+
+        void del(string pVal, bool pForce = false){
 
             PDNODE lNode = search(pVal);
 
             if(lNode){
                 if(lNode->sVal == pVal){
+
+                    if(pForce)lNode->sFrec = 1; // Si esta activada la frecuencia, en lugar de sacar, solo le restamos uno
                     
-                    if(lNode == aHead){
-                        
-                        if(lNode->sNext){
+                    if(aChkFrec && (lNode->sFrec > 1)){
 
-                            lNode->sNext->sPrev = NULL;
-                        }
-                        if (aHead == aTail){
-
-                            aTail = NULL;
-                        }
-
-                        aHead = lNode->sPrev;
-                        delete lNode; 
+                        lNode->sFrec--;
                     }
                     else{
+                        /* Se validan 3 casos, que se quiera eliminar el head
+                            , el tail, y hasta el final, un nodo de en medio
+                        */
+                        if(lNode == aHead){
+                        
+                            if(lNode->sNext){
 
-                        if(lNode == aTail){
-
-                            if(lNode->sPrev){
-
-                                lNode->sPrev->sNext = NULL;
+                                lNode->sNext->sPrev = NULL;
                             }
-                            
-                            aTail = lNode->sPrev;
-                            delete lNode;
+                            if (aHead == aTail){
+
+                                aTail = NULL;
+                            }
+
+                            aHead = lNode->sPrev;
+                            delete lNode; 
                         }
                         else{
 
-                            PDNODE lS = lNode->sNext;
-                            lNode->sPrev->sNext = lS; // lNode acaba de salir de la lista ascendente
-                            lS->sPrev = lNode->sPrev; // Fuera de la lista descendente
-                            delete lNode;
+                            if(lNode == aTail){
+
+                                if(lNode->sPrev){
+
+                                    lNode->sPrev->sNext = NULL;
+                                }
+                                
+                                aTail = lNode->sPrev;
+                                delete lNode;
+                            }
+                            else{
+
+                                PDNODE lS = lNode->sNext;
+                                lNode->sPrev->sNext = lS; // lNode acaba de salir de la lista ascendente
+                                lS->sPrev = lNode->sPrev; // Fuera de la lista descendente
+                                delete lNode;
+                            }
                         }
-                    }
-                    
+                    }  
                 }
             }
         }//del
 
+        void read(string pPath, char pMethod){ // r, l, o
+
+            auto lStart = chrono::high_resolution_clock::now();
+            string lLine;
+            ifstream lFile(pPath);
+
+            while(getline(lFile, lLine)){
+
+                switch(pMethod){
+                    case 'r': insertRight(lLine); break;
+                    case 'l': insertLeft(lLine); break;
+                    case 'o': insert(lLine); break;
+                }
+            }
+            lFile.close();
+
+            auto lElapsed = chrono::high_resolution_clock::now() - lStart;
+            long long lMicroseconds = chrono::duration_cast<std::chrono::microseconds>(lElapsed).count();
+            cout << lMicroseconds << "ms" << endl;
+        } // read 
+
+        void write(string pPath, char pMethod) { // a, d
+
+        } // write
+
     protected:
+        PDNODE find(string pVal){ // Entrega donde DEBERÍA ir el nodo nuevo en orden
+
+            PDNODE lN = aHead;
+
+            if(lN){
+
+                if(pVal < aHead->sVal){
+
+                    lN = NULL;
+                }
+                else{
+
+                    if(pVal >= aTail->sVal){
+
+                        lN = aTail;
+                    }
+                    else{
+
+                        while(lN){
+
+                            if(pVal < lN->sVal)
+                                break;
+                            
+                            lN = lN->sNext;
+                        }
+                    }
+                }
+            }
+
+            return lN;
+        } //find
+
+
         PDNODE search(string pVal){
 
             PDNODE lNode = aHead;
@@ -161,7 +325,7 @@ class DLista{
             return lNode;
         } //Entrega el nodo del valor que se busca
 
-        PDNODE getNew(string pVal){
+        PDNODE getNew(string pVal){ // Creador de nodos
 
             PDNODE lTemp = new DNODE;
 
@@ -170,6 +334,7 @@ class DLista{
                 lTemp->sVal = pVal;
                 lTemp->sNext = NULL;
                 lTemp->sPrev = NULL;
+                lTemp->sFrec = 1;
             }
 
             return lTemp;
