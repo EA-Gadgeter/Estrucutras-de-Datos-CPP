@@ -275,6 +275,41 @@ class DLista{
 
         void write(string pPath, char pMethod) { // a, d
 
+            auto lStart = chrono::high_resolution_clock::now();
+            ofstream lFile(pPath);
+            PDNODE lTemp = NULL;    
+
+            if(pMethod == 'a')
+                lTemp = aHead;
+            else
+                lTemp = aTail;    
+
+            if(lFile.is_open()){
+
+                while(lTemp != NULL){
+
+                    if(aChkFrec){
+                        
+                        for(int i = 0; i < lTemp->sFrec; i++){
+                            lFile << lTemp->sVal << endl;
+                        }
+                    }
+                    else{
+                        lFile << lTemp->sVal << endl;
+                    }
+
+                    if(pMethod == 'a')
+                        lTemp = lTemp->sNext;
+                    else if(pMethod == 'd')
+                        lTemp = lTemp->sPrev;    
+                }
+
+                lFile.close();
+                auto lElapsed = chrono::high_resolution_clock::now() - lStart;
+                long long lMicroseconds = chrono::duration_cast<std::chrono::microseconds>(lElapsed).count();
+                cout << lMicroseconds << "ms" << endl;
+
+            }else cout << "Error de escritura de archivo";
         } // write
 
     protected:

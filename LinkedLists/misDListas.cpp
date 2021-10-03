@@ -6,7 +6,7 @@ using namespace std;
 int main(){
 
 
-    DLista lLst = DLista(true);
+    DLista lLst = DLista();
 
     lLst.insertRight("Moscu"); lLst.show();
     lLst.insertRight("Tokyo"); lLst.show();
@@ -52,13 +52,26 @@ int main(){
     lLst.insertLeft("Tokyo"); lLst.show();
     lLst.insertRight("Lisboa"); lLst.show();
     lLst.insertRight("Lisboa"); lLst.show();
+    lLst.insert("Lisboa"); lLst.show();
+    lLst.insert("Berlin"); lLst.show();
+    lLst.insert("Helsinki"); lLst.show();
+    lLst.insert("Chernobyl"); lLst.show();
+    lLst.insert("Tetelcingo"); lLst.show();
+    lLst.show();
+    // Berlin(1) ->Chernobyl(1) ->Helsinki(1) ->Tokyo(2) ->Lisboa(3) ->Tetelcingo(1)
 
     cout << endl << "----" << endl << endl;
 
+    lLst.write("miarchivo.txt", 'a');
+
     lLst.clear();
 
+    /*
     // gutemberg.org
-    //lLst.read("dsadsa", 'r');
-
+    lLst.read("C:\\Users\\Chino\\Downloads\\timemachine.txt", 'o');
+    
+    // Tiempo por insertRight: 55001ms
+    // Tiempo por ordenacion: 76994ms
+    */
     
 }
