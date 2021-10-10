@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
 
-
+    
     DLista lLst = DLista();
 
     lLst.insertRight("Moscu"); lLst.show();
@@ -66,12 +66,12 @@ int main(){
 
     lLst.clear();
 
-    /*
+    
     // gutemberg.org
     lLst.read("C:\\Users\\Chino\\Downloads\\timemachine.txt", 'o');
     
     // Tiempo por insertRight: 55001ms
     // Tiempo por ordenacion: 76994ms
-    */
+    
     
 }

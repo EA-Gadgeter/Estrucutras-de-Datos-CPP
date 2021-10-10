@@ -58,10 +58,17 @@ class LLista{
 
             cout << "-> ";
             while(lTemp){
-                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "") << " ->";
+                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "");
+                if(lTemp->sLst){
+                    cout << " [";
+                    lTemp->sLst->show();
+                    cout << " ] " << endl;
+                }
+                cout << " -> ";
                 lTemp = lTemp->sNext;
             }
-            cout << " -> =" << endl; 
+            cout << "= " << endl;
+            
         } // descr
 
         void showD(){
@@ -70,86 +77,27 @@ class LLista{
 
             cout << "-> ";
             while(lTemp){
-                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "") << " ->";
+                cout << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "");
+                if(lTemp->sLst){ // Solo si el nodo tiene una lista, lo imprimimos
+                    cout << " [";
+                    lTemp->sLst->show();
+                    cout << " ] ";
+                }
+                cout << " -> ";
                 lTemp = lTemp->sPrev;
             }
-            cout << " -> =" << endl;
+            cout << "= " << endl;
 
         }
 
         void insertRight(string pVal){
 
-            PLNODE lTemp = getNew(pVal);
-
-            if(aHead == NULL){ // Por si la lista esta vacia
-                
-                aHead = lTemp;
-                aTail = lTemp;
-            }
-            else{
-                if(aChkFrec){ // A lor largo del programa es una validación, que activa
-                            // la frecuencia de los valores de la lista
-                    PLNODE lN = search(pVal);
-
-                    if(lN){
-                        
-                        if(lN->sVal == pVal){
-                            lN->sFrec++;
-                        }
-                    }
-                    else{
-
-                        aTail->sNext = lTemp;
-                        lTemp->sPrev = aTail;
-                        aTail = lTemp;
-                    }
-
-                }
-                else{
-
-                    aTail->sNext = lTemp;
-                    lTemp->sPrev = aTail;
-                    aTail = lTemp;
-                }
-            }
+            PLNODE lTemp = pinsertRight(pVal); // la direccion se guarda pero luego se borra
         }
 
         void insertLeft(string pVal){
             
-            PLNODE lTemp = getNew(pVal);
-
-            if(aTail == NULL){ // Por si la lista esta vacia
-            
-                aHead = lTemp;
-                aTail = lTemp;
-            }
-            else{
-
-                if(aChkFrec){
-
-                    PLNODE lN = search(pVal);
-
-                    if(lN){
-                        
-                        if(lN->sVal == pVal){
-                            lN->sFrec++;
-                        }
-                    }
-                    else{
-
-                        aHead->sPrev = lTemp;
-                        lTemp->sNext = aHead;
-                        aHead = lTemp;
-                    }
-
-                }
-                else{
-
-                    aHead->sPrev = lTemp;
-                    lTemp->sNext = aHead;
-                    aHead = lTemp;
-                }
-            }
+            PLNODE lTemp = pinsertLeft(pVal);
         }
 
         void insert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
@@ -225,9 +173,8 @@ class LLista{
                 PLNODE lN = search(pValH); // Buscamos el valor horizontal
                 
                 if(lN == NULL){ // Si no lo encuentra..
-
-                    insert(pValH);
-                    lN = search(pValH);
+                
+                    lN = pinsert(pValH);
 
                     if(lN){
                         if(pValV != ""){ 
@@ -430,4 +377,144 @@ class LLista{
 
             return lTemp;
         }
+
+        PLNODE pinsertRight(string pVal){
+
+
+            if(aHead == NULL){ // Por si la lista esta vacia
+                
+                aHead = getNew(pVal);
+                aTail = aHead;
+                return aHead;
+            }
+            else{
+                if(aChkFrec){ // A lor largo del programa es una validación, que activa
+                            // la frecuencia de los valores de la lista
+                    PLNODE lN = search(pVal);
+
+                    if(lN){
+                        
+                        if(lN->sVal == pVal){
+                            lN->sFrec++; 
+                        }
+                        return lN;
+                    }
+                    else{
+                        PLNODE lTemp = getNew(pVal);  
+                        aTail->sNext = lTemp;
+                        lTemp->sPrev = aTail;
+                        aTail = lTemp;
+                        return lTemp;
+                    }
+
+                }
+                else{
+
+                    PLNODE lTemp = getNew(pVal);    
+                    aTail->sNext = lTemp;
+                    lTemp->sPrev = aTail;
+                    aTail = lTemp;
+                    return lTemp;
+                }
+            }
+            
+        }
+
+        PLNODE pinsertLeft(string pVal){
+            
+
+            if(aHead == NULL){ // Por si la lista esta vacia
+            
+                aHead = getNew(pVal);
+                aTail = aHead;
+                return aHead;
+            }
+            else{
+
+                if(aChkFrec){
+
+                    PLNODE lN = search(pVal);
+
+                    if(lN){
+                        
+                        if(lN->sVal == pVal){
+                            lN->sFrec++;
+                        }
+                        return lN;
+                    }
+                    else{
+                        PLNODE lTemp = getNew(pVal);
+                        aHead->sPrev = lTemp;
+                        lTemp->sNext = aHead;
+                        aHead = lTemp;
+                        return lTemp;
+                    }
+
+                }
+                else{
+                    PLNODE lTemp = getNew(pVal);
+                    aHead->sPrev = lTemp;
+                    lTemp->sNext = aHead;
+                    aHead = lTemp;
+                    return lTemp;
+                }
+            }
+        }
+
+        PLNODE pinsert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
+
+            if(aHead == NULL){ // if si la lista esta vacia
+            
+                aHead = getNew(pVal);
+                aTail = aHead; 
+                return aHead;
+            }
+            else{
+
+                PLNODE lN = find(pVal); // Buscamos donde debería ir el valor
+
+                if(lN == NULL){
+
+                    return pinsertLeft(pVal);
+                }
+                else{
+
+                    if((lN == aTail) && (pVal > aTail->sVal)){
+
+                        return pinsertRight(pVal);
+                    }
+                    else{
+
+                        PLNODE lF = lN->sPrev;
+
+                        if((aChkFrec) && ((lF->sVal == pVal) || (lN->sVal == pVal))){ // Verificamos si hay repetecion de valores
+
+                            if(lF->sVal == pVal){
+                                lF->sFrec++;
+                                return lF;
+                            }    
+                            else{
+                                lN->sFrec++;
+                                return lN;
+                            }
+                                
+
+                            
+                        }
+                        else{
+                            PLNODE lTemp = getNew(pVal);
+
+                            // Entre father y lN va el temp
+                            lF->sNext = lTemp;
+                            lTemp->sNext = lN;
+                            lN->sPrev = lTemp;
+                            lTemp->sPrev = lF;
+                            return lTemp;
+                        }
+                    }
+                }
+            }
+        }
+
+
 };
