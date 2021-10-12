@@ -62,13 +62,19 @@ int main(){
 
     cout << endl << "----" << endl << endl;
 
-    lLst.write("miarchivo.txt", 'a');
+    //lLst.write("miarchivo.txt", 'a');
 
     lLst.clear();
 
+    lLst.insert("Perro");
+    lLst.insert("Gato");
+    lLst.insert("Pato");
+    lLst.show();
+    lLst.del("Gato");
+    lLst.show();
     
     // gutemberg.org
-    lLst.read("C:\\Users\\Chino\\Downloads\\timemachine.txt", 'o');
+    //lLst.read("C:\\Users\\Chino\\Downloads\\timemachine.txt", 'o');
     
     // Tiempo por insertRight: 55001ms
     // Tiempo por ordenacion: 76994ms

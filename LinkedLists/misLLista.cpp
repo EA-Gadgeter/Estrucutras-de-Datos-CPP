@@ -15,5 +15,8 @@ int main(){
     lLL.insert("Drama", "Animales nocturnos");
     lLL.insert("Accion", "Men in Black");
     lLL.insert("Fantasia", "El senior de los anillos");
+    lLL.del("Drama", "Animales nocturnos", false);
     lLL.show();
+
+    return 0;
 }    

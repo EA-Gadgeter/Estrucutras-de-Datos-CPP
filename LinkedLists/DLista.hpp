@@ -224,7 +224,7 @@ class DLista{
                                 aTail = NULL;
                             }
 
-                            aHead = lNode->sPrev;
+                            aHead = lNode->sNext;
                             delete lNode; 
                         }
                         else{

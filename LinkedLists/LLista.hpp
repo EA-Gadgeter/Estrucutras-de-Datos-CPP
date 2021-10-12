@@ -102,52 +102,7 @@ class LLista{
 
         void insert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
 
-            if(aHead == NULL){ // if si la lista esta vacia
-            
-                aHead = getNew(pVal);
-                aTail = aHead; 
-            }
-            else{
-
-                PLNODE lN = find(pVal); // Buscamos donde debería ir el valor
-
-                if(lN == NULL){
-
-                    insertLeft(pVal);
-                }
-                else{
-
-                    if((lN == aTail) && (pVal > aTail->sVal)){
-
-                        insertRight(pVal);
-                    }
-                    else{
-
-                        PLNODE lF = lN->sPrev;
-
-                        if((aChkFrec) && ((lF->sVal == pVal) || (lN->sVal == pVal))){ // Verificamos si hay repetecion de valores
-
-                            if(lF->sVal == pVal)
-                                lF->sFrec++;
-                            else
-                                lN->sFrec++;
-
-                            
-                        }
-                        else{
-                            PLNODE lTemp = getNew(pVal);
-
-                            // Entre father y lN va el temp
-                            lF->sNext = lTemp;
-                            lTemp->sNext = lN;
-                            lN->sPrev = lTemp;
-                            lTemp->sPrev = lF;
-                        }
-
-                        
-                    }
-                }
-            }
+            PLNODE lTemp = pinsert(pVal);
         }
 
         void insert(string pValH, string pValV){
@@ -216,17 +171,17 @@ class LLista{
                             , el tail, y hasta el final, un nodo de en medio
                         */
                         if(lNode == aHead){
-                        
                             if(lNode->sNext){
-
+                                
                                 lNode->sNext->sPrev = NULL;
                             }
                             if (aHead == aTail){
-
+                                
                                 aTail = NULL;
                             }
 
-                            aHead = lNode->sPrev;
+                            aHead = lNode->sNext;
+                            if(lNode->sLst) delete lNode->sLst; // Solo si existe una lista vertical, la destruimos
                             delete lNode; 
                         }
                         else{
@@ -250,6 +205,24 @@ class LLista{
                             }
                         }
                     }  
+                }
+            }
+        }//del
+
+        void del(string pValH, string pValV, bool pForce = false){
+            
+            PLNODE lNode = search(pValH);
+
+            if(lNode){ // Si existe el nodo
+            
+                // Puede el usuario halla pasado un nulo de string "", un cuyo caso, no instanciamos
+                // el objeto
+                if(pValV != ""){ 
+                    
+                    if(lNode->sLst){ // Si la nodo tiene una lista vertical
+
+                        lNode->sLst->del(pValV); // Simplmente borramos el nodo de la lista vertical
+                    }
                 }
             }
         }//del
