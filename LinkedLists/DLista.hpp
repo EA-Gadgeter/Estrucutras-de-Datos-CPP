@@ -312,6 +312,8 @@ class DLista{
             }else cout << "Error de escritura de archivo";
         } // write
 
+        void write(ofstream& pLFile); // Funcion necesaria para que write de listas de listas funcione, por ahora solo esta declarada
+
     protected:
         PDNODE find(string pVal){ // Entrega donde DEBERÍA ir el nodo nuevo en orden
 

@@ -6,7 +6,22 @@
 
 #include "DLista.hpp"
 
+
 using namespace std;
+
+// Definimos la función porque en listas de listas es neceario
+void DLista:: write(ofstream& pLFile){ // Pasamos por referencia el ofstream
+
+    PDNODE lTemp = aHead; 
+
+    while(lTemp != NULL){
+
+        pLFile << "\t" << lTemp->sVal << endl;
+        lTemp = lTemp->sNext;
+        
+    }
+    // Basicamente la funcion simplmente escribe todo lo que hay en la lista vertical con un tab antes
+}
 
 typedef class LNODE* PLNODE;
 
@@ -209,7 +224,7 @@ class LLista{
             }
         }//del
 
-        void del(string pValH, string pValV, bool pForce = false){
+        void delV(string pValH, string pValV, bool pForce = false){
             
             PLNODE lNode = search(pValH);
 
@@ -219,73 +234,78 @@ class LLista{
                 // el objeto
                 if(pValV != ""){ 
                     
-                    if(lNode->sLst){ // Si la nodo tiene una lista vertical
+                    if(lNode->sLst){ // Si el nodo tiene una lista vertical
 
                         lNode->sLst->del(pValV); // Simplmente borramos el nodo de la lista vertical
                     }
                 }
             }
         }//del
-        /*
-        void read(string pPath, char pMethod){ // r, l, o
+        
+        void read(string pPath){ //o
 
-            auto lStart = chrono::high_resolution_clock::now();
-            string lLine;
+
+            string lLine, lastLine;
             ifstream lFile(pPath);
+            bool isBegin = true;
 
-            while(getline(lFile, lLine)){
+            if(lFile.is_open()){
 
-                switch(pMethod){
-                    case 'r': insertRight(lLine); break;
-                    case 'l': insertLeft(lLine); break;
-                    case 'o': insert(lLine); break;
+                while(getline(lFile, lLine)){
+
+                    if (lLine[0] == '\t' && isBegin){ // Evitar que el principio empieze con un tab
+                        continue; // Si es un tab y todavía es el principio, nos saltamos todo el ciclo
+                    }
+                    else if(lLine[0] != '\t' && isBegin){ // Si es el principio pero ya no es un tab..
+
+                        insert(lLine); // Insertamos nuestra primera linea
+                        lastLine = lLine; // Necesitamos guardar registro de la ultima linea, en caso que la siguiente sea vertical
+                        isBegin = false; // isBegin es falso, ya no estamos al principio
+                        continue; // Nos podemos saltar todo el ciclo
+                    }
+
+                    if(lLine[0] == '\t'){ // Si la linea empieza por un tab..
+                    
+                        insert(lastLine, lLine.substr(1, lLine.length())); // Esta linea va a pertenecer a la lista vertical de la anterior
+                        // Hacemos un subtr, para quitar el tab del principio
+                    }
+                    else{ // Si no, insertamos la linea que no existe, y lastLine ahora va a ser esta linea
+                        insert(lLine);
+                        lastLine = lLine;
+                    }
+                    
+
                 }
-            }
-            lFile.close();
+                lFile.close();
+                
+            }else cout << "Error de lectura del archivo" << endl;
 
-            auto lElapsed = chrono::high_resolution_clock::now() - lStart;
-            long long lMicroseconds = chrono::duration_cast<std::chrono::microseconds>(lElapsed).count();
-            cout << lMicroseconds << "ms" << endl;
         } // read 
+        
+        void write(string pPath) { // a
 
-        void write(string pPath, char pMethod) { // a, d
-
-            auto lStart = chrono::high_resolution_clock::now();
             ofstream lFile(pPath);
-            PLNODE lTemp = NULL;    
-
-            if(pMethod == 'a')
-                lTemp = aHead;
-            else
-                lTemp = aTail;    
+            PLNODE lTemp = aHead;    
 
             if(lFile.is_open()){
 
                 while(lTemp != NULL){
 
-                    if(aChkFrec){
-                        
-                        for(int i = 0; i < lTemp->sFrec; i++){
-                            lFile << lTemp->sVal << endl;
-                        }
-                    }
-                    else{
-                        lFile << lTemp->sVal << endl;
+                    lFile << lTemp->sVal << endl;
+
+                    if(lTemp->sLst){
+
+                        lTemp->sLst->write(lFile);
                     }
 
-                    if(pMethod == 'a')
-                        lTemp = lTemp->sNext;
-                    else if(pMethod == 'd')
-                        lTemp = lTemp->sPrev;    
+                    lTemp = lTemp->sNext;
                 }
 
                 lFile.close();
-                auto lElapsed = chrono::high_resolution_clock::now() - lStart;
-                long long lMicroseconds = chrono::duration_cast<std::chrono::microseconds>(lElapsed).count();
-                cout << lMicroseconds << "ms" << endl;
 
             }else cout << "Error de escritura de archivo";
-        } // write */
+        } // write 
+
 
     protected:
         PLNODE find(string pVal){ // Entrega donde DEBERÍA ir el nodo nuevo en orden
