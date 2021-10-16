@@ -3,11 +3,31 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <algorithm>
 
 #include "DLista.hpp"
 
 
 using namespace std;
+
+static inline void ltrim(std::string & s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+		return !std::isspace(ch);
+		}));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string& s) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+		return !std::isspace(ch);
+		}).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string& s) {
+	ltrim(s);
+	rtrim(s);
+}
 
 // Definimos la función porque en listas de listas es neceario
 void DLista:: write(ofstream& pLFile){ // Pasamos por referencia el ofstream
@@ -209,6 +229,7 @@ class LLista{
                                 }
                                 
                                 aTail = lNode->sPrev;
+                                if(lNode->sLst) delete lNode->sLst;
                                 delete lNode;
                             }
                             else{
@@ -216,6 +237,7 @@ class LLista{
                                 PLNODE lS = lNode->sNext;
                                 lNode->sPrev->sNext = lS; // lNode acaba de salir de la lista ascendente
                                 lS->sPrev = lNode->sPrev; // Fuera de la lista descendente
+                                if(lNode->sLst) delete lNode->sLst;
                                 delete lNode;
                             }
                         }
@@ -224,56 +246,67 @@ class LLista{
             }
         }//del
 
-        void delV(string pValH, string pValV, bool pForce = false){
+        void delD(string pValH, string pValV, bool pForce = false){
             
             PLNODE lNode = search(pValH);
 
             if(lNode){ // Si existe el nodo
             
-                // Puede el usuario halla pasado un nulo de string "", un cuyo caso, no instanciamos
-                // el objeto
-                if(pValV != ""){ 
-                    
-                    if(lNode->sLst){ // Si el nodo tiene una lista vertical
+                if(lNode->sVal == pValH){
 
-                        lNode->sLst->del(pValV); // Simplmente borramos el nodo de la lista vertical
+                    if(pForce){
+
+                        del(pValH, pForce);
+                    }
+                    else{
+                        
+                        if(pValV != ""){
+
+                            if(lNode -> sLst) lNode->sLst->del(pValV);
+                        }
+                        else{
+                            del(pValH, true);
+                        }
                     }
                 }
             }
         }//del
+
+        void delV(string pValV){ // Recorre todas las listas verticales, fuerza el del.
+
+            PLNODE lTemp = aHead;
+
+            while(lTemp){
+                
+                if(lTemp->sLst){ 
+                    lTemp->sLst->del(pValV, true);
+                }
+                
+                lTemp = lTemp->sNext;
+            }
+        }
         
         void read(string pPath){ //o
 
-
-            string lLine, lastLine;
+        
+            string lLine, lastLine = "";
             ifstream lFile(pPath);
-            bool isBegin = true;
-
+        
             if(lFile.is_open()){
 
                 while(getline(lFile, lLine)){
 
-                    if (lLine[0] == '\t' && isBegin){ // Evitar que el principio empieze con un tab
-                        continue; // Si es un tab y todavía es el principio, nos saltamos todo el ciclo
-                    }
-                    else if(lLine[0] != '\t' && isBegin){ // Si es el principio pero ya no es un tab..
-
-                        insert(lLine); // Insertamos nuestra primera linea
-                        lastLine = lLine; // Necesitamos guardar registro de la ultima linea, en caso que la siguiente sea vertical
-                        isBegin = false; // isBegin es falso, ya no estamos al principio
-                        continue; // Nos podemos saltar todo el ciclo
-                    }
-
-                    if(lLine[0] == '\t'){ // Si la linea empieza por un tab..
-                    
-                        insert(lastLine, lLine.substr(1, lLine.length())); // Esta linea va a pertenecer a la lista vertical de la anterior
-                        // Hacemos un subtr, para quitar el tab del principio
-                    }
-                    else{ // Si no, insertamos la linea que no existe, y lastLine ahora va a ser esta linea
+                    if(lLine[0] != '\t'){ // Si no empieza por tab, la metemos
                         insert(lLine);
                         lastLine = lLine;
                     }
-                    
+                    else{
+
+                        if(lastLine != ""){ // Si no es "", es que se ingreso algo antes
+                            trim(lLine); // Borramos los espacios que contiene el string
+                            insert(lastLine, lLine);
+                        }
+                    }
 
                 }
                 lFile.close();
@@ -291,7 +324,7 @@ class LLista{
 
                 while(lTemp != NULL){
 
-                    lFile << lTemp->sVal << endl;
+                    lFile << lTemp->sVal << (aChkFrec ? "(" + to_string(lTemp->sFrec) + ")": "") << endl;
 
                     if(lTemp->sLst){
 
@@ -444,7 +477,7 @@ class LLista{
                     }
 
                 }
-                else{
+                else{ 
                     PLNODE lTemp = getNew(pVal);
                     aHead->sPrev = lTemp;
                     lTemp->sNext = aHead;
@@ -454,60 +487,50 @@ class LLista{
             }
         }
 
-        PLNODE pinsert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
+    PLNODE pinsert(string pVal){ // Inserta un nodo en orde, en el caso de string, por orden alfabetico
 
-            if(aHead == NULL){ // if si la lista esta vacia
-            
-                aHead = getNew(pVal);
-                aTail = aHead; 
-                return aHead;
+        if(aHead == NULL){
+
+            aHead = getNew(pVal);
+            aTail = aHead;
+            return aHead;
+        }
+        else{
+
+            PLNODE lN = find(pVal);
+
+            if(lN == NULL){
+                return pinsertLeft(pVal);
             }
             else{
-
-                PLNODE lN = find(pVal); // Buscamos donde debería ir el valor
-
-                if(lN == NULL){
-
-                    return pinsertLeft(pVal);
+                if((lN == aTail) && (pVal >= aTail->sVal)){
+                    return pinsertRight(pVal);
                 }
                 else{
 
-                    if((lN == aTail) && (pVal > aTail->sVal)){
+                    PLNODE lF = lN->sPrev;
+                    if ((aChkFrec == true) && ((lF->sVal == pVal) || (lN->sVal == pVal))){
 
-                        return pinsertRight(pVal);
-                    }
-                    else{
-
-                        PLNODE lF = lN->sPrev;
-
-                        if((aChkFrec) && ((lF->sVal == pVal) || (lN->sVal == pVal))){ // Verificamos si hay repetecion de valores
-
-                            if(lF->sVal == pVal){
-                                lF->sFrec++;
-                                return lF;
-                            }    
-                            else{
-                                lN->sFrec++;
-                                return lN;
-                            }
-                                
-
-                            
+                        if(lF->sVal == pVal){
+                            lF->sFrec++;
+                            return lF;
                         }
                         else{
-                            PLNODE lTemp = getNew(pVal);
-
-                            // Entre father y lN va el temp
-                            lF->sNext = lTemp;
-                            lTemp->sNext = lN;
-                            lN->sPrev = lTemp;
-                            lTemp->sPrev = lF;
-                            return lTemp;
+                            lN->sFrec++;
+                            return lN;
                         }
+                    }
+                    else{
+                        PLNODE lTemp = getNew(pVal);
+                        lF->sNext = lTemp;
+                        lTemp->sNext = lN;
+                        lN->sPrev = lTemp;
+                        lTemp->sPrev = lF;
+                        return lTemp;
                     }
                 }
             }
         }
 
-
+    }    
 };

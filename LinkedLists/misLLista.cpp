@@ -8,7 +8,7 @@ int main(){
     
 
     LLista lLL = LLista();
-
+    
     lLL.read("aaaa.txt");
 
     lLL.show();
@@ -22,8 +22,8 @@ int main(){
     lLL.insert("Accion", "Men in Black");
     lLL.insert("Fantasia", "El senior de los anillos");
     lLL.show();
-    lLL.write("aaaa.txt");
-    */
+    lLL.write("aaaa.txt");*/
+    
 
     return 0;
 }    
